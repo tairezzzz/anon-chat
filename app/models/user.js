@@ -11,7 +11,8 @@ const mongoose = require('mongoose'),
             token: String,
             email: String,
             name: String
-        }
+        },
+        rooms: Array
     });
 
 userSchema.methods.hash = function(password) {
@@ -19,6 +20,13 @@ userSchema.methods.hash = function(password) {
 };
 userSchema.methods.validPassword = function(password) {
     return bcrypt.compareSync(password, this.local.password);
+};
+userSchema.methods.joinRoom = function(room) {
+    return this.rooms.push(room.toLowerCase());
+};
+userSchema.methods.leaveRoom = function(room) {
+    let index = this.rooms.indexOf(room);
+    return this.rooms.splice(index, 1);
 };
 
 module.exports = mongoose.model('User', userSchema);

@@ -1,4 +1,5 @@
-const path = require('path');
+const path = require('path'),
+    Chat = require('../app/models/chat');
 
 module.exports = function(app, passport) {
     app.get('/', (req, res) => {
@@ -10,7 +11,7 @@ module.exports = function(app, passport) {
         });*/
         res.json({
             user: req.user
-        })
+        });
     });
     app.get('/auth/google', passport.authenticate('google', {
         scope: ['profile', 'email']
@@ -19,6 +20,13 @@ module.exports = function(app, passport) {
         successRedirect : '/profile',
         failureRedirect : '/'
     }));
+    app.get('/room', function(req, res) {
+        Chat.find({
+            'room': req.query.room.toLowerCase()
+        }).exec(function(err, msgs) {
+            res.json(msgs);
+        });
+    });
     app.post('/login', passport.authenticate('local-login', {
         successRedirect : '/profile',
         failureRedirect : '/'

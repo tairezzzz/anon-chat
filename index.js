@@ -15,7 +15,7 @@ require('./config/passport')(passport);
 
 app.use(express.static('public'));
 app.use(session({
-  secret: 'sdts5werfDeFi9',
+  secret: 'sdtS5werfDeFi9',
   resave: true,
   saveUninitialized: true
 }));

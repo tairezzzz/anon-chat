@@ -1,19 +1,38 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'),
+    Chat = require('../app/models/chat');
 
 module.exports = (io) => {
     console.log(`SocketIO up...`);
     io.on('connection', socket => {
-        console.log('connected');
+        console.log(`'connected ${socket}`);
+
         socket.on('login', user => {
             io.broadcast.emit('message', 'new user connected');
         });
         socket.on('disconnect', () => {
             console.log('user disconnected');
         });
-        socket.on('message', msg => {
-            console.log(`send message: ${msg}`);
-            io.emit('message', msg);
+        socket.on('message', data => {
+            console.log(`send message: ${data.msg} to ${data.room} room`);
+            var newMsg = new Chat({
+                content: data.msg,
+                room: data.room.toLowerCase(),
+                created: new Date()
+            });
+            newMsg.save((err, msg) => {
+                if (err) throw err;
+                io.to(msg.room).emit('message', msg.content);
+            });
         });
+        socket.on('switch room', data => {
+            console.log(`switching room form ${data.leaveRoom} to ${data.joinRoom}`);
+            socket.leave(data.leaveRoom);
+            socket.join(data.joinRoom);
+            io.in(data.leaveRoom).emit('user left', data);
+            io.in(data.joinRoom).emit('user joined', data);
+
+        });
+
     })
 };
 /*

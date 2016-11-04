@@ -27,6 +27,7 @@ module.exports = passport => {
                         newUser.google.token = token;
                         newUser.google.name = profile.displayName;
                         newUser.google.email = profile.emails[0].value;
+                        newuser.rooms = ['default'];
                         newUser.save(function(err) {
                             if (err) throw err;
                             return done(null, newUser);
@@ -79,6 +80,7 @@ module.exports = passport => {
                         var newUser = new User();
                         newUser.local.email    = email;
                         newUser.local.password = newUser.hash(password);
+                        newuser.rooms = ['default'];
                         newUser.save(err => {
                             if (err) throw err;
                             return done(null, newUser);
